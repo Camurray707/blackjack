@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Code/Blackjack/blackjack.cpp
+iostream
+-
+vector
+-
+string
+-
+cstdlib
+-
+ctime
+-
+bits/stdc++.h
+-
+iomanip
+-
+

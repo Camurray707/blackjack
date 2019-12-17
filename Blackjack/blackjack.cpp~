@@ -1,0 +1,65 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <stdlib.h>
+#include <time.h>
+#include <bits/stdc++.h>
+#include <iomanip>
+
+using namespace std;
+
+vector<string> deckOfCards(int numDecks);      //create a deck of cards into a vector
+vector<string> shuffleDeck(vector<string>& deck);         //random shuffles deck
+void printCard(vector<string> deckOfCards);    //prints current hand |A|...
+
+
+int main() {
+
+  vector<string> test = deckOfCards(1);
+  shuffleDeck(test);
+  printCard(test);
+  return 0;
+}
+
+vector<string> deckOfCards(int numDecks){
+
+    string value[] = {"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"};
+    string suit[] = {" of spade", " of club", " of diamond", " of heart"};
+    vector<string> cards;
+
+    for (int k = 0; k < numDecks; k++) {
+      for (int i = 0; i < 4; i++) {
+	for (int j = 0; j < 13; j++) {
+	  cards.push_back(value[j] + suit[i]);
+	}
+      }
+    }
+  
+    return cards;
+}
+
+vector<string> shuffleDeck(vector<string>& deck) {
+
+  srand(time(0));
+  int test = rand()% 13;
+  random_shuffle(deck.begin(), deck.end());
+
+  return deck;
+}
+
+void printCard (vector<string> deckOfCards) {
+
+  string answer;
+  cout<<"Would you like to play black jack?"<<endl;
+  cin>>answer;
+
+    for (int i = 0; i < deckOfCards.size(); i++) {
+      while (answer != "end") {
+      cout<<deckOfCards.at(i)<<endl;
+      cin>>answer;
+      break;
+      }
+    }
+    cout<<"Continue:(yes/no)"<<endl;
+    cin>>answer;
+}
