@@ -106,26 +106,24 @@ void Maze::findMazePath() {
 
             //comparing currNodeRow - 1 and node above    && that their columns are equal
             if ((currNodeRow - 1) == nextNodeRow && (currNodeCol == nextNodeCol)) {                     //compare top cell
-                if (nextNode == prevNode) {continue;}
-                for (int i = 0; i < myDeadEnds.size(); i++) {if (nextNode == myDeadEnds.at(i)) goto backtrack;}
+                if (nextNode == prevNode) { continue; }
+                for (int i = 0; i < myDeadEnds.size(); i++) { if (nextNode == myDeadEnds.at(i)) goto backtrack; }
                 if (currNodeValue == nextNodeValue) {
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
                     currentNode = nextNode;
                     goto begin;
                 }
-
             }
             else if (((currNodeCol + 1) == nextNodeCol) && (currNodeRow == nextNodeRow)) {                //compare right cell
                 if (nextNode == prevNode) {continue;}
-                for (int i = 0; i < myDeadEnds.size(); i++) {if (nextNode == myDeadEnds.at(i)) goto backtrack;}
+                for (int i = 0; i < myDeadEnds.size(); i++) {if (nextNode == myDeadEnds.at(i)) goto backtrack;} //fixme: auto backtrack doesnt look down
                 if (currNodeValue == nextNodeValue) {
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
                     currentNode = nextNode;
                     goto begin;
                 }
-
             }
             else if ((currNodeRow + 1) == nextNodeRow  && (currNodeCol == nextNodeCol)) {                   //compare bottom cell
                 if (nextNode == prevNode) {continue;}
@@ -147,9 +145,9 @@ void Maze::findMazePath() {
                     goto begin;
                 }
             }
-                else if (this->isDeadEnd(currentNode)) {                                                        //fixme: find out if we reached dead end)
+                else if (this->isDeadEnd(currentNode)) {
                 //mazeLadder.pop()???, currNode = prev, prev = mazeLadder.top()
-                //fixme: move prevNode back two nodes, move currNode back one node,
+
                 backtrack:
                 myDeadEnds.push_back(currentNode);
                 currentNode = prevNode;
@@ -157,12 +155,11 @@ void Maze::findMazePath() {
                 mazeLadder.pop();
                 prevNode = mazeLadder.top();
                 mazeLadder.push(currentNode);
-
+                goto begin;
 
 
 
                 }
-                //fixme: try i-- and put deadNode into a used vector in case of multiple dead ends
 
 
         }
