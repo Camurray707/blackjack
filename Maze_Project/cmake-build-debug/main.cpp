@@ -1,3 +1,5 @@
+//Christopher Murray
+
 #include <iostream>
 #include "Maze.h"
 

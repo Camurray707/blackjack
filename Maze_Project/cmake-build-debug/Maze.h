@@ -1,5 +1,5 @@
 //
-// Created by ASUS on 1/28/2020.
+// Created by Christopher Murray on 1/28/2020.
 //
 
 #ifndef MAZE_PROJECT_MAZE_H
@@ -17,12 +17,14 @@ class Maze {
 
 private:
     vector<tuple<char, int, int>> myCell;
+    stack<tuple<char, int, int>> myDeadEnds;
     tuple<char, int, int> mazeTarget;
     tuple<char, int, int> mazeEntry;
     vector<char> myNode;
     stack<tuple<char, int, int>> mazeLadder;
     void findMazePath();
     int myRow, myCol;
+    bool isDeadEnd(tuple<char, int, int> test);
 
 public:
     //makeCells create tuples of each cell row/col and vectors of each node

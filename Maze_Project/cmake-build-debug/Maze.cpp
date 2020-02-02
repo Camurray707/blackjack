@@ -1,5 +1,5 @@
 //
-// Created by ASUS on 1/28/2020.
+// Created by Christopher Murray on 1/28/2020.
 //
 
 #include "Maze.h"
@@ -85,15 +85,16 @@ void Maze::findEntry() {
 
 void Maze::findMazePath() {
     mazeLadder.push(mazeEntry);                 //start at entry
-//    mazeLadder.push(myCell.at(46));             //move right one cell fixme:find the cell to the right of mazeEntry
     auto currentNode = mazeLadder.top();
     auto prevNode = currentNode;
-    auto currNodeValue = get<0>(currentNode);
-    auto currNodeRow = get<1>(currentNode);
-    auto currNodeCol = get<2>(currentNode);
+//    auto currNodeValue = get<0>(currentNode);
+//    auto currNodeRow = get<1>(currentNode);
+//    auto currNodeCol = get<2>(currentNode);
+
+    begin:
 
     while (mazeLadder.top() != mazeTarget) {    //when top of stack is = to exit end
-        begin:
+
         for (int i = 0; i < myCell.size(); i++) {
 
             auto nextNode = myCell.at(i);
@@ -105,9 +106,14 @@ void Maze::findMazePath() {
             auto currNodeRow = get<1>(currentNode);
             auto currNodeCol = get<2>(currentNode);
 
+            auto deadNode = mazeLadder.top();
+            auto deadNodeValue = get<0>(currentNode);
+            auto deadNodeRow = get<1>(currentNode);
+            auto deadNodeCol = get<2>(currentNode);
+
             //comparing currNodeRow - 1 and node above    && that their columns are equal
             if ((currNodeRow - 1) == nextNodeRow && (currNodeCol == nextNodeCol)) {                     //compare top cell
-                if (nextNode == prevNode) {continue;}
+                if (nextNode == prevNode  || nextNode == deadNode) {continue;}
                 if (currNodeValue == nextNodeValue) {
                     mazeLadder.push(nextNode);
                     prevNode = currentNode;
@@ -117,7 +123,7 @@ void Maze::findMazePath() {
 
             }
             else if (((currNodeCol + 1) == nextNodeCol) && (currNodeRow == nextNodeRow)) {                //compare right cell
-                if (nextNode == prevNode) {continue;}
+                if (nextNode == prevNode  || nextNode == deadNode) {continue;}
                 if (currNodeValue == nextNodeValue) {
                     mazeLadder.push(nextNode);
                     prevNode = currentNode;
@@ -127,16 +133,26 @@ void Maze::findMazePath() {
 
             }
             else if ((currNodeRow + 1) == nextNodeRow  && (currNodeCol == nextNodeCol)) {                   //compare bottom cell
-                if (nextNode == prevNode) {continue;}
+                if (nextNode == prevNode  || nextNode == deadNode  || nextNode == myDeadEnds.top()) {continue;}
                 if (currNodeValue == nextNodeValue) {
                     mazeLadder.push(nextNode);
                     prevNode = currentNode;
                     currentNode = nextNode;}
-                    goto begin;
-            }else {
-
-
+                    goto begin;             //fixme: need to compare left cell aswell
             }
+                else if (this->isDeadEnd(currentNode)) {                                                        //fixme: find out if we reached dead end)
+                //mazeLadder.pop()???, currNode = prev, prev = mazeLadder.top()
+                                                                                    //fixme: move prevNode back two nodes, move currNode back one node,
+                myDeadEnds.push(currentNode);          //put dead node into used stack
+                currentNode = prevNode;
+                mazeLadder.pop();
+                mazeLadder.pop();
+                prevNode = mazeLadder.top();
+                mazeLadder.push(currentNode);
+
+                }
+                //fixme: try i-- and put deadNode into a used vector in case of multiple dead ends
+
 
         }
 
@@ -159,4 +175,33 @@ void Maze::printSolution() {
         }
     }
     this->printMaze();
+}
+
+bool Maze::isDeadEnd(tuple<char, int, int> test) {      //fixme: left wall - 1
+    int count = 0;
+
+    auto currNodeValue = get<0>(test);
+    auto currNodeRow = get<1>(test);
+    auto currNodeCol = get<2>(test);
+
+    if (currNodeCol == 0 || currNodeCol == myCol -1) {return false;}
+
+    for (int i = 0; i < myCell.size(); i++) {
+        auto nextNodeValue = get<0>(myCell.at(i));
+        auto nextNodeRow = get<1>(myCell.at(i));
+        auto nextNodeCol = get<2>(myCell.at(i));
+
+        if ((currNodeRow - 1) == nextNodeRow && (currNodeCol == nextNodeCol)) {                    //top cell
+            if (nextNodeValue == '1') {count++;}
+        } else if ((currNodeRow + 1) == nextNodeRow && (currNodeCol == nextNodeCol)) {               //bottom cell
+            if (nextNodeValue == '1') {count++;}
+        } else if ((currNodeRow == nextNodeRow && (currNodeCol - 1 == nextNodeCol))) {               //left cell
+            if (nextNodeValue == '1') {count++;}
+        }else if (currNodeRow == nextNodeRow && (currNodeCol + 1 == nextNodeCol)) {                 //right cell
+            if (nextNodeValue == '1') {count++;}
+        }
+
+    }
+    if (count == 3) {return true;}
+    return false;
 }
