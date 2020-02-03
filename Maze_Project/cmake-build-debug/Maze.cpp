@@ -73,7 +73,7 @@ void Maze::findEntry() {
             get<2>(mazeEntry) = colTest;
             cout<<"Entry at Row: "<<get<1>(myCell.at(i))<<", Col: "<<get<2>(myCell.at(i))<<endl;
         }
-        if (valueTest == '0' && colTest == 14) {
+        if (valueTest == '0' && colTest == 14) {        //fixme: find end col
             get<0>(mazeTarget) = '0';
             get<1>(mazeTarget) = rowTest;
             get<2>(mazeTarget) = colTest;
@@ -87,6 +87,7 @@ void Maze::findMazePath() {
     mazeLadder.push(mazeEntry);                 //start at entry
     auto currentNode = mazeLadder.top();
     auto prevNode = currentNode;
+    auto backTrackNode = currentNode;
 
     begin:
 
@@ -105,62 +106,54 @@ void Maze::findMazePath() {
 
 
             //comparing currNodeRow - 1 and node above    && that their columns are equal
-            if ((currNodeRow - 1) == nextNodeRow && (currNodeCol == nextNodeCol)) {                     //compare top cell
-                if (nextNode == prevNode) { continue; }
-                if (this->used(nextNode)) goto right;
-                if (currNodeValue == nextNodeValue) {
+            if ((currNodeRow - 1) == nextNodeRow && (currNodeCol == nextNodeCol)
+            && nextNode != prevNode && nextNode != backTrackNode && currNodeValue == nextNodeValue && !this->used(nextNode)) {                     //compare top cell
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
                     currentNode = nextNode;
                     goto begin;
-                }
             }
-            else if (((currNodeCol + 1) == nextNodeCol) && (currNodeRow == nextNodeRow)) {                //compare right cell
-                if (nextNode == prevNode) {continue;}
-                right:
-                if (this->used(nextNode)) goto bottom;              //fixme: auto backtrack doesnt look down
-                if (currNodeValue == nextNodeValue) {
+            else if (((currNodeCol + 1) == nextNodeCol) && (currNodeRow == nextNodeRow)
+            && nextNode != prevNode && nextNode != backTrackNode && currNodeValue == nextNodeValue && !this->used(nextNode)) {                //compare right cell
+                             //fixme: auto backtrack doesnt look down
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
                     currentNode = nextNode;
                     goto begin;
-                }
             }
-            else if ((currNodeRow + 1) == nextNodeRow  && (currNodeCol == nextNodeCol)) {                   //compare bottom cell
-                if (nextNode == prevNode) {continue;}
-                bottom:
-                if (this->used(nextNode)) goto left;
-                if (currNodeValue == nextNodeValue) {
+            else if ((currNodeRow + 1) == nextNodeRow  && (currNodeCol == nextNodeCol)
+            && nextNode != prevNode && nextNode != backTrackNode && currNodeValue == nextNodeValue && !this->used(nextNode)) {                   //compare bottom cell
+
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
                     currentNode = nextNode;
                     goto begin;
-                }
+
             }
-            else if (currNodeRow == nextNodeRow  && ((currNodeCol - 1) == nextNodeCol)) {                   //compare left cell
-                if (nextNode == prevNode) {continue;}
-                left:
-                if (this->used(nextNode)) goto backtrack;
-                if (currNodeValue == nextNodeValue) {
+            else if (currNodeRow == nextNodeRow  && (currNodeCol - 1) == nextNodeCol
+            && nextNode != prevNode && nextNode != backTrackNode && currNodeValue == nextNodeValue && !this->used(nextNode)) {                   //compare left cell
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
                     currentNode = nextNode;
                     goto begin;
-                }
+
             }
-                else if (this->isDeadEnd(currentNode)) {
-                //mazeLadder.pop()???, currNode = prev, prev = mazeLadder.top()
+                else if (this->isDeadEnd(currentNode)) {            //fixme: backtracking occurs before nextNode can reach bottom of currentNode
+                //mazeLadder.pop()???, currNode = prev, prev = mazeLadder.top()             //fixme: find a way to make this true only after looking at all sides
 
                 backtrack:
-                    if (mazeLadder.size() == 2) {break;}
+                    if (mazeLadder.size() == 2) {cout<<"There is no solution."<<endl; return;}
                 myDeadEnds.push_back(currentNode);
+                    backTrackNode = currentNode;
                 currentNode = prevNode;
                 mazeLadder.pop();
                 mazeLadder.pop();
                 prevNode = mazeLadder.top();
                 mazeLadder.push(currentNode);
+
                 goto begin;
                 }
+                else if (i == 194) {goto backtrack;}
         }
     }
 }
