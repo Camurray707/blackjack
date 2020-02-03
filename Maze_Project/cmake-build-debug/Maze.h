@@ -17,7 +17,7 @@ class Maze {
 
 private:
     vector<tuple<char, int, int>> myCell;
-    stack<tuple<char, int, int>> myDeadEnds;
+    vector<tuple<char, int, int>> myDeadEnds;       //vector of dead ends to stay away from
     tuple<char, int, int> mazeTarget;
     tuple<char, int, int> mazeEntry;
     vector<char> myNode;
@@ -25,6 +25,7 @@ private:
     void findMazePath();
     int myRow, myCol;
     bool isDeadEnd(tuple<char, int, int> test);
+    bool used(tuple<char,int,int> used);
 
 public:
     //makeCells create tuples of each cell row/col and vectors of each node

@@ -107,7 +107,7 @@ void Maze::findMazePath() {
             //comparing currNodeRow - 1 and node above    && that their columns are equal
             if ((currNodeRow - 1) == nextNodeRow && (currNodeCol == nextNodeCol)) {                     //compare top cell
                 if (nextNode == prevNode) { continue; }
-                for (int i = 0; i < myDeadEnds.size(); i++) { if (nextNode == myDeadEnds.at(i)) goto backtrack; }
+                if (this->used(nextNode)) goto right;
                 if (currNodeValue == nextNodeValue) {
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
@@ -117,7 +117,8 @@ void Maze::findMazePath() {
             }
             else if (((currNodeCol + 1) == nextNodeCol) && (currNodeRow == nextNodeRow)) {                //compare right cell
                 if (nextNode == prevNode) {continue;}
-                for (int i = 0; i < myDeadEnds.size(); i++) {if (nextNode == myDeadEnds.at(i)) goto backtrack;} //fixme: auto backtrack doesnt look down
+                right:
+                if (this->used(nextNode)) goto bottom;              //fixme: auto backtrack doesnt look down
                 if (currNodeValue == nextNodeValue) {
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
@@ -127,7 +128,8 @@ void Maze::findMazePath() {
             }
             else if ((currNodeRow + 1) == nextNodeRow  && (currNodeCol == nextNodeCol)) {                   //compare bottom cell
                 if (nextNode == prevNode) {continue;}
-                for (int i = 0; i < myDeadEnds.size(); i++) {if (nextNode == myDeadEnds.at(i)) goto backtrack;}
+                bottom:
+                if (this->used(nextNode)) goto left;
                 if (currNodeValue == nextNodeValue) {
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
@@ -137,7 +139,8 @@ void Maze::findMazePath() {
             }
             else if (currNodeRow == nextNodeRow  && ((currNodeCol - 1) == nextNodeCol)) {                   //compare left cell
                 if (nextNode == prevNode) {continue;}
-                for (int i = 0; i < myDeadEnds.size(); i++) {if (nextNode == myDeadEnds.at(i)) goto backtrack;}
+                left:
+                if (this->used(nextNode)) goto backtrack;
                 if (currNodeValue == nextNodeValue) {
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
@@ -149,6 +152,7 @@ void Maze::findMazePath() {
                 //mazeLadder.pop()???, currNode = prev, prev = mazeLadder.top()
 
                 backtrack:
+                    if (mazeLadder.size() == 2) {break;}
                 myDeadEnds.push_back(currentNode);
                 currentNode = prevNode;
                 mazeLadder.pop();
@@ -156,14 +160,8 @@ void Maze::findMazePath() {
                 prevNode = mazeLadder.top();
                 mazeLadder.push(currentNode);
                 goto begin;
-
-
-
                 }
-
-
         }
-
     }
 }
 
@@ -213,3 +211,9 @@ bool Maze::isDeadEnd(tuple<char, int, int> test) {      //fixme: left wall - 1
     if (count == 3) {return true;}
     return false;
 }
+
+bool Maze::used(tuple<char,int,int> used) {
+    for (int i = 0; i < myDeadEnds.size(); i++) {if (used == myDeadEnds.at(i)) return true;}
+    return false;
+}
+
