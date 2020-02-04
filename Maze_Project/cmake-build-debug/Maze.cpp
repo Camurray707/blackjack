@@ -52,7 +52,7 @@ void Maze::printMaze() {
 
         while (i < myCell.size()) {
             for (int j = 0; j < myCol; j++) {
-                cout<<get<0>(myCell.at(i));
+                cout<<get<0>(myCell.at(i))<<' ';
                 i++;
             }
             cout << endl;
@@ -73,7 +73,7 @@ void Maze::findEntry() {
             get<2>(mazeEntry) = colTest;
             cout<<"Entry at Row: "<<get<1>(myCell.at(i))<<", Col: "<<get<2>(myCell.at(i))<<endl;
         }
-        if (valueTest == '0' && colTest == 14) {        //fixme: find end col
+        if (valueTest == '0' && colTest == myCol - 1) {
             get<0>(mazeTarget) = '0';
             get<1>(mazeTarget) = rowTest;
             get<2>(mazeTarget) = colTest;
@@ -153,7 +153,7 @@ void Maze::findMazePath() {
 
                 goto begin;
                 }
-                else if (i == 194) {goto backtrack;}
+                else if (i == myCell.size() - 1) {goto backtrack;}
         }
     }
 }
@@ -176,7 +176,7 @@ void Maze::printSolution() {
     this->printMaze();
 }
 
-bool Maze::isDeadEnd(tuple<char, int, int> test) {      //fixme: left wall - 1
+bool Maze::isDeadEnd(tuple<char, int, int> test) {
     int count = 0;
 
     auto currNodeValue = get<0>(test);

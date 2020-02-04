@@ -16,16 +16,15 @@ using namespace std;
 class Maze {
 
 private:
-    vector<tuple<char, int, int>> myCell;
+    vector<tuple<char, int, int>> myCell;           //a vector of the whole maze starting at top left to bottom right
     vector<tuple<char, int, int>> myDeadEnds;       //vector of dead ends to stay away from
-    tuple<char, int, int> mazeTarget;
-    tuple<char, int, int> mazeEntry;
-    vector<char> myNode;
-    stack<tuple<char, int, int>> mazeLadder;
-    void findMazePath();
+    tuple<char, int, int> mazeTarget;               //when maze ends
+    tuple<char, int, int> mazeEntry;                //where maze starts
+    stack<tuple<char, int, int>> mazeLadder;        //stack of cells/nodes that are solutions
+    void findMazePath();                            //find solutions to add into stack
     int myRow, myCol;
-    bool isDeadEnd(tuple<char, int, int> test);
-    bool used(tuple<char,int,int> used);
+    bool isDeadEnd(tuple<char, int, int> test);     //determines of current cell/node is a dead end or not
+    bool used(tuple<char,int,int> used);            //determines if the next cell/node is used in myDeadEnds
 
 public:
     //makeCells create tuples of each cell row/col and vectors of each node
@@ -38,10 +37,10 @@ public:
     void printSolution();
 
 
-    //printMaze prints the maze
+    //printMaze prints the original maze
     void printMaze();
 
-    //findEntry finds the row and col where the maze starts
+    //findEntry finds the row and col where the maze starts and ends
     void findEntry();
 };
 
