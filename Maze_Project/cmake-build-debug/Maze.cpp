@@ -4,6 +4,15 @@
 
 #include "Maze.h"
 
+using namespace std;
+
+Maze::Maze() {
+    myCol = 0;
+    myRow = 0;
+}
+
+Maze::~Maze() {}
+
 void Maze::openFile(string fileName) {
     string row;
     char cell;
@@ -15,7 +24,7 @@ void Maze::openFile(string fileName) {
     }
     else {
         while (newFile>>row) {
-            for (int i = 0; i < row.size(); i++){
+            for (unsigned int i = 0; i < row.size(); i++){
                 cout<<row.at(i)<<" ";
             }
             cout<<endl;
@@ -24,8 +33,7 @@ void Maze::openFile(string fileName) {
     newFile.close();
 }
 
-void Maze::makeCells(string fileName) {
-    char cells;
+void Maze::makeCells(string fileName) {             //fixme: aborted in blue
     string line;
     ifstream mazeFile;
     mazeFile.open(fileName);
@@ -35,24 +43,24 @@ void Maze::makeCells(string fileName) {
     }
     else {
         unsigned int j = 0;
-        while(getline(mazeFile,line)) {                    //i = number of col, j = number of rows
-            for (int i = 0 ; i < line.size(); i++) {
-                auto newCell = make_tuple(line.at(i), j, i);
+        while(mazeFile>>line) {                    //i = number of col, j = number of rows
+            for (unsigned int i = 0 ; i < line.size(); i++) {
+                auto newCell = make_tuple(line[i], j, i);
                 myCell.push_back(newCell);                 //each element of myCell contains a tuple of (zeros/ones, row, col)
-               // myNode.push_back(line.at(i));
             }
             j++;
         }
         myRow = j-1;
-        myCol = line.size();
+        myCol = (myCell.size()/j) - 1;
     }
+    mazeFile.close();
 }
 void Maze::printMaze() {
         unsigned int i = 0;
 
         while (i < myCell.size()) {
-            for (int j = 0; j < myCol; j++) {
-                cout<<get<0>(myCell.at(i))<<' ';
+            for (int j = 0; j <= myCol; j++) {
+                cout<<get<0>(myCell.at(i));
                 i++;
             }
             cout << endl;
@@ -62,25 +70,35 @@ void Maze::printMaze() {
 
 void Maze::findEntry() {
 
-    for (int i = 0; i < myCell.size(); i++) {
+    for (unsigned int i = 0; i < myCell.size(); i++) {
         auto valueTest = get<0>(myCell.at(i));
         auto rowTest = get<1>(myCell.at(i));
         auto colTest = get<2>(myCell.at(i));
 
-        if (valueTest == '0' && colTest == 0) {
+        if (valueTest == '0' && (colTest == 0 || colTest == myCol || rowTest == 0 || rowTest == myRow)) {
             get<0>(mazeEntry) = '0';
             get<1>(mazeEntry) = rowTest;
             get<2>(mazeEntry) = colTest;
-            cout<<"Entry at Row: "<<get<1>(myCell.at(i))<<", Col: "<<get<2>(myCell.at(i))<<endl;
+            //cout<<"Entry at Row: "<<get<1>(myCell.at(i))<<", Col: "<<get<2>(myCell.at(i))<<endl;
+            break;
         }
-        if (valueTest == '0' && colTest == myCol - 1) {
+    }
+}
+void Maze::findTarget() {
+
+    for (unsigned int i = 0; i < myCell.size(); i++) {
+        auto valueTest = get<0>(myCell.at(i));
+        auto rowTest = get<1>(myCell.at(i));
+        auto colTest = get<2>(myCell.at(i));
+
+        if (valueTest == '0' && (colTest == 0 || colTest == myCol || rowTest == 0 || rowTest == myRow) && myCell.at(i) != mazeEntry) {
             get<0>(mazeTarget) = '0';
             get<1>(mazeTarget) = rowTest;
             get<2>(mazeTarget) = colTest;
-            cout<<"Exit at Row: "<<get<1>(myCell.at(i))<<", Col: "<<get<2>(myCell.at(i))<<endl;
+            //cout<<"Exit at Row: "<<get<1>(myCell.at(i))<<", Col: "<<get<2>(myCell.at(i))<<endl;
+            break;
         }
     }
-    cout<<endl;
 }
 
 void Maze::findMazePath() {
@@ -93,7 +111,7 @@ void Maze::findMazePath() {
 
     while (mazeLadder.top() != mazeTarget) {    //when top of stack is = to exit end
 
-        for (int i = 0; i < myCell.size(); i++) {
+        for (unsigned int i = 0; i < myCell.size(); i++) {
 
             auto nextNode = myCell.at(i);
             auto nextNodeValue = get<0>(myCell.at(i));
@@ -115,7 +133,6 @@ void Maze::findMazePath() {
             }
             else if (((currNodeCol + 1) == nextNodeCol) && (currNodeRow == nextNodeRow)
             && nextNode != prevNode && nextNode != backTrackNode && currNodeValue == nextNodeValue && !this->used(nextNode)) {                //compare right cell
-                             //fixme: auto backtrack doesnt look down
                     prevNode = mazeLadder.top();
                     mazeLadder.push(nextNode);
                     currentNode = nextNode;
@@ -138,11 +155,14 @@ void Maze::findMazePath() {
                     goto begin;
 
             }
-                else if (this->isDeadEnd(currentNode)) {            //fixme: backtracking occurs before nextNode can reach bottom of currentNode
-                //mazeLadder.pop()???, currNode = prev, prev = mazeLadder.top()             //fixme: find a way to make this true only after looking at all sides
-
+                else if (this->isDeadEnd(currentNode)) {
                 backtrack:
-                    if (mazeLadder.size() == 2) {cout<<"There is no solution."<<endl; return;}
+                    if (mazeLadder.size() == 2) {
+                        mazeLadder.pop();
+                        mazeLadder.pop();
+                        cout<<"THERE IS NO ";
+                        return;
+                    }
                 myDeadEnds.push_back(currentNode);
                     backTrackNode = currentNode;
                 currentNode = prevNode;
@@ -161,15 +181,16 @@ void Maze::findMazePath() {
 
 void Maze::printSolution() {
     this->findMazePath();
-    cout<<"SOLUTION:"<<endl;
+    cout<<"SOLUTION"<<endl;
+    start:
     while (mazeLadder.size() > 0) {
-        start:
-        for (int i = 0; i < myCell.size(); i++) {                   //delete the path from entry to target
+        for (unsigned int i = 0; i < myCell.size(); i++) {                   //delete the path from entry to target
             if (myCell.at(i) == mazeLadder.top()) {
                 get<0>(myCell.at(i)) = ' ';
                 mazeLadder.pop();
-                if (mazeLadder.empty()) {this->printMaze();return;}
-                goto start;
+               // if (mazeLadder.empty()) {this->printMaze(); return;}
+               goto start;
+               //break;
             }
         }
     }
@@ -183,9 +204,9 @@ bool Maze::isDeadEnd(tuple<char, int, int> test) {
     auto currNodeRow = get<1>(test);
     auto currNodeCol = get<2>(test);
 
-    if (currNodeCol == 0 || currNodeCol == myCol -1) {return false;}
+    if (currNodeCol == 0 || currNodeCol == myCol) {return false;}
 
-    for (int i = 0; i < myCell.size(); i++) {
+    for (unsigned int i = 0; i < myCell.size(); i++) {
         auto nextNodeValue = get<0>(myCell.at(i));
         auto nextNodeRow = get<1>(myCell.at(i));
         auto nextNodeCol = get<2>(myCell.at(i));
@@ -206,7 +227,7 @@ bool Maze::isDeadEnd(tuple<char, int, int> test) {
 }
 
 bool Maze::used(tuple<char,int,int> used) {
-    for (int i = 0; i < myDeadEnds.size(); i++) {if (used == myDeadEnds.at(i)) return true;}
+    for (unsigned int i = 0; i < myDeadEnds.size(); i++) {if (used == myDeadEnds.at(i)) return true;}
     return false;
 }
 
