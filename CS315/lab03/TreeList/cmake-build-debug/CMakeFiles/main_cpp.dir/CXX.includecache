@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Code/CS315/lab03/TreeList/BinSearchTree.cpp
+iostream
+-
+BinSearchTree.h
+C:/Code/CS315/lab03/TreeList/BinSearchTree.h
+TreeNode.h
+C:/Code/CS315/lab03/TreeList/TreeNode.h
+
+C:/Code/CS315/lab03/TreeList/BinSearchTree.h
+
+C:/Code/CS315/lab03/TreeList/TreeNode.cpp
+TreeNode.h
+C:/Code/CS315/lab03/TreeList/TreeNode.h
+
+C:/Code/CS315/lab03/TreeList/TreeNode.h
+
+C:/Code/CS315/lab03/TreeList/main.cpp
+iostream
+-
+fstream
+-
+BinSearchTree.h
+C:/Code/CS315/lab03/TreeList/BinSearchTree.h
+TreeNode.h
+C:/Code/CS315/lab03/TreeList/TreeNode.h
+
